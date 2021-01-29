@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "590697882278",
+    "project_id": "anihelp-86625",
+    "storage_bucket": "anihelp-86625.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590697882278:android:646d9909d15d4b0ac20a67",
+        "android_client_info": {
+          "package_name": "com.rishav.anihelp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "590697882278-gc7o5i2u0q2415vvdm5lm5dckjgh2fbe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rishav.anihelp",
+            "certificate_hash": "2b4791605537ed33fe485f958f97612ffe7ce4c8"
+          }
+        },
+        {
+          "client_id": "590697882278-40r5vfr0hppvr8p79kh9hcn0etb00l8a.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEIvc-JBN7PKk-i5RoxGaSkUFDNr0S-5I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "590697882278-40r5vfr0hppvr8p79kh9hcn0etb00l8a.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
