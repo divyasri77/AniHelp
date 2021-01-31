@@ -1,3 +1,4 @@
+import 'package:anihelp/BackEnd/Auth/google_auth.dart';
 import 'package:anihelp/FrontEnd/Components/components.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,8 +28,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+              IconButton(icon: Icon(Icons.exit_to_app), onPressed: () => GoogleAuth().googleLogOutUser(context)),
               ProfileNameDetails(firebaseCurrentUser: _firebaseCurrentUser),
               SizedBox(height: MediaQuery.of(context).size.height * 0.05),
               Container(
@@ -63,7 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   return StreamBuilder<QuerySnapshot>(
                     stream: userSnapshots.data.docs.first.reference
                         .collection("history")
-                        .orderBy("time", descending: false)
+                        .orderBy("time", descending: true)
                         .snapshots(),
                     builder: (context, historySnapshots) {
                       if (!historySnapshots.hasData)
@@ -77,6 +79,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           history.add(hist.data());
                         }
                       }
+                      if (history.isEmpty)
+                        return Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Color(0xff00a86b).withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text(
+                                "No petting history found",
+                                style: _textStyle.copyWith(
+                                    fontSize: 18, color: Colors.black),
+                              ),
+                            ),
+                          ),
+                        );
 
                       return Expanded(
                         child: Container(
@@ -87,14 +105,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               vertical: 10, horizontal: 15),
                           child: ListView.separated(
                             physics: BouncingScrollPhysics(),
-                            itemCount: 2,
+                            itemCount: history.length,
                             itemBuilder: (context, index) => Container(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [

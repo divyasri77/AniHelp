@@ -27,8 +27,9 @@ class _PostsScreenState extends State<PostsScreen> {
           backgroundColor: Color(0xff00a86b),
           actions: [
             Center(
-                child:
-                    Text("Add Post", style: _textStyle.copyWith(fontSize: 16))),
+                child: Text("Add Post",
+                    style: _textStyle.copyWith(
+                        fontSize: 16, fontFamily: "CarterOne"))),
             SizedBox(width: 20),
             Padding(
               padding: EdgeInsets.only(right: 20),
@@ -52,7 +53,10 @@ class _PostsScreenState extends State<PostsScreen> {
         body: Padding(
           padding: EdgeInsets.all(20),
           child: StreamBuilder<QuerySnapshot>(
-            stream: FirebaseFirestore.instance.collection("posts").snapshots(),
+            stream: FirebaseFirestore.instance
+                .collection("posts")
+                .orderBy("createdAt", descending: true)
+                .snapshots(),
             builder: (context, snapshots) {
               if (!snapshots.hasData)
                 return Components().circularProgressIndicator();
@@ -63,66 +67,97 @@ class _PostsScreenState extends State<PostsScreen> {
                 for (var snap in snapshots.data.docs) posts.add(snap.data());
               }
 
-              if (posts.isEmpty)
-                return Center(child: Text("No data found"));
+              if (posts.isEmpty) return Center(child: Text("No data found"));
 
               return ListView.separated(
                 physics: BouncingScrollPhysics(),
                 itemCount: posts.length,
-                separatorBuilder: (context, index) => Divider(
-                    height: 100, thickness: 0, color: Color(0xff00a86b)),
+                separatorBuilder: (context, index) =>
+                    Divider(height: 70, thickness: 0, color: Color(0xff00a86b)),
                 itemBuilder: (context, index) {
                   return Container(
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        posts[index]["photoUrl"] == null
-                            ? Center(
-                              child: Container(
-                                height: MediaQuery.of(context).size.height *
-                                    0.2,
-                                width:
-                                    MediaQuery.of(context).size.width * 0.3,
-                                decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    borderRadius:
-                                        BorderRadius.circular(20)),
-                                child: Center(
-                                  child: Lottie.asset(
-                                      "assets/70-image-icon-tadah.json"),
-                                ),
+                        Row(
+                          children: [
+                            posts[index]["photoUrl"] == null
+                                ? Center(
+                                    child: Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.2,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
+                                      decoration: BoxDecoration(
+                                          color: Colors.black,
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      child: Center(
+                                        child: Lottie.asset(
+                                            "assets/70-image-icon-tadah.json"),
+                                      ),
+                                    ),
+                                  )
+                                : ClipRRect(
+                                    child: CachedNetworkImage(
+                                      imageUrl: posts[index]["photoUrl"],
+                                      placeholder: (context, url) =>
+                                          Components()
+                                              .circularProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          Icon(Icons.error),
+                                      fit: BoxFit.cover,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.2,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.3,
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                            SizedBox(width: 20),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  SizedBox(height: 10),
+                                  Text(posts[index]["title"],
+                                      textAlign: TextAlign.end,
+                                      maxLines: 3,
+                                      style: _textStyle),
+                                  SizedBox(height: 20),
+                                  Text(posts[index]["description"],
+                                      textAlign: TextAlign.end,
+                                      maxLines: 10,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: _textStyle.copyWith(
+                                          fontSize: 14, color: Colors.grey)),
+                                ],
                               ),
-                            )
-                            : ClipRRect(
-                              child: CachedNetworkImage(
-                                imageUrl: posts[index]["photoUrl"],
-                                placeholder: (context, url) => Components()
-                                    .circularProgressIndicator(),
-                                errorWidget: (context, url, error) =>
-                                    Icon(Icons.error),
-                                fit: BoxFit.cover,
-                                height: MediaQuery.of(context).size.height *
-                                    0.2,
-                                width:
-                                    MediaQuery.of(context).size.width * 0.3,
-                              ),
-                              borderRadius: BorderRadius.circular(20),
                             ),
-                        SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                          ],
+                        ),
+                        SizedBox(height: 10),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 1),
+                          child: Row(
                             children: [
-                              SizedBox(height: 10),
-                              Text(posts[index]["title"],
-                                  textAlign: TextAlign.end,
-                                  maxLines: 3, style: _textStyle),
-                              SizedBox(height: 20),
-                              Text(posts[index]["description"],
-                                  textAlign: TextAlign.end,
-                                  maxLines: 10,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: _textStyle.copyWith(
-                                      fontSize: 14, color: Colors.grey)),
+                              Text(
+                                "Posted ${DateTime.now().difference(DateTime.parse(posts[index]["createdAt"].toDate().toString())).inDays.toString()} days ago",
+                                style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.grey[700],
+                                    fontStyle: FontStyle.italic),
+                              ),
+                              Spacer(),
+                              Text(
+                                posts[index]["name"],
+                                style: TextStyle(
+                                    fontFamily: "Montserrat",
+                                    color: Colors.grey[700],
+                                    fontStyle: FontStyle.italic),
+                              ),
                             ],
                           ),
                         ),

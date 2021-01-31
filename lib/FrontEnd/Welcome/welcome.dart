@@ -51,8 +51,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       SizedBox(height: 5),
                       Padding(
                         padding: EdgeInsets.only(right: 5),
-                        child: Text("SubTitle text for the title",
-                            style: TextStyle(fontFamily: "CarterOne")),
+                        child: Text(
+                          "A pet away from home",
+                          style: TextStyle(
+                            fontFamily: "CarterOne",
+                            letterSpacing: 2,
+                            color: Colors.grey[400],
+                            fontSize: 16,
+                          ),
+                        ),
                       )
                     ],
                   ),
@@ -71,7 +78,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   child: SignInButton(Buttons.Google,
                       padding: EdgeInsets.only(left: 30.0),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(10.0))),
                       onPressed: () {
                     setState(() {
                       _isLoading = true;

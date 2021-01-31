@@ -47,91 +47,97 @@ class AlertDialogBox extends StatefulWidget {
 class _AlertDialogBoxState extends State<AlertDialogBox> {
   String title, content;
   File _image;
-  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
-    return ModalProgressHUD(
-      inAsyncCall: _isLoading,
-      child: AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        title: Text("Add a new post", style: TextStyle(fontFamily: "CarterOne")),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                    hintText: "Caption is half of the post",
-                    labelText: "Title",
-                    labelStyle:
-                        TextStyle(fontFamily: "Montserrat", color: Colors.black)),
-                onChanged: (value) {
-                  setState(() {
-                    title = value;
-                  });
-                },
-              ),
-              SizedBox(height: 30),
-              TextField(
-                decoration: InputDecoration(
-                    hintText: "Keep a brief content",
-                    labelText: "Content",
-                    labelStyle:
-                        TextStyle(fontFamily: "Montserrat", color: Colors.black)),
-                onChanged: (value) {
-                  setState(() {
-                    content = value;
-                  });
-                },
-              ),
-              SizedBox(height: 30),
-              IconButton(
-                  icon: Icon(Icons.add_a_photo),
-                  onPressed: () => _imgFromGallery()),
-              Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.black)),
-                child: _image == null
-                    ? Center(
-                        child: IconButton(
-                        icon: Icon(Icons.image_not_supported),
-                        onPressed: () => _imgFromGallery(),
-                      ))
-                    : ClipRRect(
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Image.file(
-                            _image,
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            fit: BoxFit.contain,
-                          ),
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      title: Text("Add a new post", style: TextStyle(fontFamily: "CarterOne")),
+      content: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                  hintText: "Caption is half of the post",
+                  labelText: "Title",
+                  labelStyle:
+                      TextStyle(fontFamily: "Montserrat", color: Colors.black)),
+              onChanged: (value) {
+                setState(() {
+                  title = value;
+                });
+              },
+            ),
+            SizedBox(height: 30),
+            TextField(
+              decoration: InputDecoration(
+                  hintText: "Keep a brief content",
+                  labelText: "Content",
+                  labelStyle:
+                      TextStyle(fontFamily: "Montserrat", color: Colors.black)),
+              onChanged: (value) {
+                setState(() {
+                  content = value;
+                });
+              },
+            ),
+            SizedBox(height: 30),
+            IconButton(
+                icon: Icon(Icons.add_a_photo),
+                onPressed: () => _imgFromGallery()),
+            Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.black)),
+              child: _image == null
+                  ? Center(
+                      child: IconButton(
+                      icon: Icon(Icons.image_not_supported),
+                      onPressed: () => _imgFromGallery(),
+                    ))
+                  : ClipRRect(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Image.file(
+                          _image,
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          fit: BoxFit.contain,
                         ),
                       ),
-              ),
-            ],
-          ),
+                    ),
+            ),
+          ],
         ),
-        actions: [
-          RaisedButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("Cancel",
-                style: Components().textStyle().copyWith(fontSize: 14)),
-            color: Colors.black,
-          ),
-          RaisedButton(
-            onPressed: () {
-              AddPost().addPost(title, content, _image).whenComplete(() {
-                Navigator.pop(context);
-              });
-            },
-            child: Text("Add",
-                style: Components().textStyle().copyWith(fontSize: 14)),
-            color: Colors.black,
-          ),
-        ],
       ),
+      actions: [
+        RaisedButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text("Cancel",
+              style: Components().textStyle().copyWith(fontSize: 14)),
+          color: Colors.black,
+        ),
+        RaisedButton(
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    content: Center(
+                      child: Components().circularProgressIndicator(),
+                    ),
+                  );
+                });
+            AddPost().addPost(title, content, _image).whenComplete(() {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            });
+          },
+          child: Text("Add",
+              style: Components().textStyle().copyWith(fontSize: 14)),
+          color: Colors.black,
+        ),
+      ],
     );
   }
 
@@ -291,6 +297,32 @@ class CardContainer extends StatelessWidget {
               context: context),
         ],
       ),
+    );
+  }
+}
+
+class FirstRow extends StatelessWidget {
+  const FirstRow({Key key, @required this.text}) : super(key: key);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Flexible(
+          child: FittedBox(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontFamily: "Montserrat",
+                fontSize: 18,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 20),
+        Icon(Icons.arrow_downward)
+      ],
     );
   }
 }

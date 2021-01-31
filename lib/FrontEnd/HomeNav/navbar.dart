@@ -1,3 +1,4 @@
+import 'package:anihelp/FrontEnd/HomeNav/Media/media.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'Donate/donate.dart';
@@ -13,7 +14,7 @@ class _NavBarState extends State<NavBar> {
   int _selectedIndex = 0;
   var padding = EdgeInsets.symmetric(horizontal: 18, vertical: 5);
   double gap = 10;
-  List body = [DonateScreen(), PostsScreen(), ProfileScreen()];
+  List body = [DonateScreen(), PostsScreen(),MediaScreen(), ProfileScreen()];
   PageController _pageController = PageController();
 
   @override
@@ -27,7 +28,7 @@ class _NavBarState extends State<NavBar> {
               _selectedIndex = page;
             });
           },
-          itemCount: 3,
+          itemCount: 4,
           itemBuilder: (context, position) {
             return Scaffold(
               body: body[position],
@@ -55,6 +56,7 @@ class _NavBarState extends State<NavBar> {
               tabs: [
                 navBarButtons(Icons.pets, "Petify", Color(0xff00a86b)),
                 navBarButtons(Icons.post_add, "Posts", Color(0xff00a86b)),
+                navBarButtons(Icons.video_collection, "Media", Color(0xff00a86b)),
                 navBarButtons(Icons.person, "Me", Color(0xff00a86b)),
               ],
               selectedIndex: _selectedIndex,
