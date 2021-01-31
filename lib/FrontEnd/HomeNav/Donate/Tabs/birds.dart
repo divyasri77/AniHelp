@@ -21,7 +21,7 @@ class _BirdsTabState extends State<BirdsTab> {
             documents.add(snap.data());
           }
         }
-        return CardContainer(documents: documents, context: context);
+        return CardContainer(documents: documents, context: context, animalCollection: "birds");
       },
     );
   }

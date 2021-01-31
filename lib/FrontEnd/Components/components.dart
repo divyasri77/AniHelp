@@ -1,7 +1,11 @@
+import 'dart:io';
+import 'package:anihelp/BackEnd/AddPost/add_post.dart';
 import 'package:anihelp/FrontEnd/HomeNav/Donate/Book/book.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class Components {
   Widget circularProgressIndicator() {
@@ -11,21 +15,137 @@ class Components {
   }
 
   Widget donateCards(String text, TextStyle textStyle) {
-    return Expanded(
-      child: Container(
-        width: 100,
-        child: Text(text, textAlign: TextAlign.end, style: textStyle),
+    return FittedBox(
+        child: Text(text, textAlign: TextAlign.end, style: textStyle));
+  }
+
+  Widget errorSnackBar(String text) {
+    return SnackBar(
+      content: Text(text),
+    );
+  }
+
+  TextStyle textStyle() {
+    return TextStyle(
+        color: Colors.white,
+        fontFamily: "Montserrat",
+        fontSize: 16,
+        letterSpacing: 2,
+        fontWeight: FontWeight.bold);
+  }
+}
+
+class AlertDialogBox extends StatefulWidget {
+  AlertDialogBox({@required this.scaffoldKey});
+
+  final scaffoldKey;
+
+  @override
+  _AlertDialogBoxState createState() => _AlertDialogBoxState();
+}
+
+class _AlertDialogBoxState extends State<AlertDialogBox> {
+  String title, content;
+  File _image;
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return ModalProgressHUD(
+      inAsyncCall: _isLoading,
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        title: Text("Add a new post", style: TextStyle(fontFamily: "CarterOne")),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                    hintText: "Caption is half of the post",
+                    labelText: "Title",
+                    labelStyle:
+                        TextStyle(fontFamily: "Montserrat", color: Colors.black)),
+                onChanged: (value) {
+                  setState(() {
+                    title = value;
+                  });
+                },
+              ),
+              SizedBox(height: 30),
+              TextField(
+                decoration: InputDecoration(
+                    hintText: "Keep a brief content",
+                    labelText: "Content",
+                    labelStyle:
+                        TextStyle(fontFamily: "Montserrat", color: Colors.black)),
+                onChanged: (value) {
+                  setState(() {
+                    content = value;
+                  });
+                },
+              ),
+              SizedBox(height: 30),
+              IconButton(
+                  icon: Icon(Icons.add_a_photo),
+                  onPressed: () => _imgFromGallery()),
+              Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.black)),
+                child: _image == null
+                    ? Center(
+                        child: IconButton(
+                        icon: Icon(Icons.image_not_supported),
+                        onPressed: () => _imgFromGallery(),
+                      ))
+                    : ClipRRect(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Image.file(
+                            _image,
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          RaisedButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel",
+                style: Components().textStyle().copyWith(fontSize: 14)),
+            color: Colors.black,
+          ),
+          RaisedButton(
+            onPressed: () {
+              AddPost().addPost(title, content, _image).whenComplete(() {
+                Navigator.pop(context);
+              });
+            },
+            child: Text("Add",
+                style: Components().textStyle().copyWith(fontSize: 14)),
+            color: Colors.black,
+          ),
+        ],
       ),
     );
   }
 
-  textStyle() {
-    return TextStyle(
-        color: Colors.white,
-        fontFamily: "Montserrat",
-        fontSize: 13,
-        letterSpacing: 2,
-        fontWeight: FontWeight.bold);
+  _imgFromGallery() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
   }
 }
 
@@ -33,6 +153,7 @@ class CardContent extends StatefulWidget {
   const CardContent(
       {Key key,
       @required this.documents,
+      @required this.animalCollection,
       @required TextStyle textStyle,
       @required this.context})
       : _textStyle = textStyle,
@@ -41,6 +162,7 @@ class CardContent extends StatefulWidget {
   final List documents;
   final TextStyle _textStyle;
   final BuildContext context;
+  final String animalCollection;
 
   @override
   _CardContentState createState() => _CardContentState();
@@ -60,8 +182,9 @@ class _CardContentState extends State<CardContent> {
             onTap: () => Navigator.push(
                 context,
                 CupertinoPageRoute(
-                    builder: (context) =>
-                        BookingScreen(documents: widget.documents[index]))),
+                    builder: (context) => BookingScreen(
+                        document: widget.documents[index],
+                        animalCollection: widget.animalCollection))),
             child: Container(
               height: MediaQuery.of(context).size.height * 0.3,
               width: MediaQuery.of(context).size.width * 0.9,
@@ -83,42 +206,49 @@ class _CardContentState extends State<CardContent> {
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: Row(
                   children: [
-                    Hero(
-                      tag: "${widget.documents[index]["name"]}",
-                      child: ClipRRect(
-                        child: CachedNetworkImage(
-                          imageUrl: widget.documents[index]["photoUrl"],
-                          placeholder: (context, url) =>
-                              Components().circularProgressIndicator(),
-                          errorWidget: (context, url, error) => Icon(Icons.error),
-                          fit: BoxFit.cover,
-                          height: MediaQuery.of(context).size.height * 0.2,
-                          width: MediaQuery.of(context).size.width * 0.4,
+                    Flexible(
+                      flex: 3,
+                      child: Hero(
+                        tag: "${widget.documents[index]["name"]}",
+                        child: ClipRRect(
+                          child: CachedNetworkImage(
+                            imageUrl: widget.documents[index]["photoUrl"],
+                            placeholder: (context, url) =>
+                                Components().circularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
+                            fit: BoxFit.cover,
+                            height: MediaQuery.of(context).size.height * 0.2,
+                            width: MediaQuery.of(context).size.width * 0.4,
+                          ),
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    Expanded(child: SizedBox(height: 20)),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 30),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Components().donateCards(
-                              widget.documents[index]["name"],
-                              widget._textStyle.copyWith(fontSize: 20)),
-                          Components().donateCards(
-                              "${widget.documents[index]["age"]} years old",
-                              widget._textStyle),
-                          //Flexible(child: SizedBox(height: 5)),
-                          Components().donateCards(
-                              widget.documents[index]["breed"],
-                              widget._textStyle),
-                          Components().donateCards(
-                              "${widget.documents[index]["city"]}, ${widget.documents[index]["country"]}",
-                              widget._textStyle),
-                        ],
+                    Spacer(),
+                    Flexible(
+                      flex: 3,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 30),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Components().donateCards(
+                                widget.documents[index]["name"],
+                                widget._textStyle.copyWith(fontSize: 25)),
+                            Flexible(child: SizedBox(height: 40)),
+                            Components().donateCards(
+                                "${widget.documents[index]["age"]} years old",
+                                widget._textStyle),
+                            //Flexible(child: SizedBox(height: 5)),
+                            Components().donateCards(
+                                widget.documents[index]["breed"],
+                                widget._textStyle),
+                            Components().donateCards(
+                                "${widget.documents[index]["city"]}, ${widget.documents[index]["country"]}",
+                                widget._textStyle),
+                          ],
+                        ),
                       ),
                     )
                   ],
@@ -134,11 +264,15 @@ class _CardContentState extends State<CardContent> {
 
 class CardContainer extends StatelessWidget {
   const CardContainer(
-      {Key key, @required this.documents, @required this.context})
+      {Key key,
+      @required this.documents,
+      @required this.context,
+      @required this.animalCollection})
       : super(key: key);
 
   final List documents;
   final BuildContext context;
+  final String animalCollection;
 
   @override
   Widget build(BuildContext context) {
@@ -152,6 +286,7 @@ class CardContainer extends StatelessWidget {
           SizedBox(height: 20),
           CardContent(
               documents: documents,
+              animalCollection: animalCollection,
               textStyle: Components().textStyle(),
               context: context),
         ],

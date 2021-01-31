@@ -21,7 +21,7 @@ class _CatsTabState extends State<CatsTab> {
             documents.add(snap.data());
           }
         }
-        return CardContainer(documents: documents, context: context);
+        return CardContainer(documents: documents, context: context, animalCollection: "cats");
       },
     );
   }

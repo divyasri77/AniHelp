@@ -25,9 +25,9 @@ class _DonateScreenState extends State<DonateScreen> {
                   indicatorColor: Colors.white,
                   indicatorSize: TabBarIndicatorSize.label,
                   labelStyle: TextStyle(
-                      fontFamily: "Montserrat",
+                      fontFamily: "CarterOne",
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 2),
+                      letterSpacing: 3),
                   tabs: [
                     Tab(text: "Dogs"),
                     Tab(text: "Cats"),

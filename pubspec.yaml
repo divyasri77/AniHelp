@@ -22,6 +22,10 @@ dependencies:
   google_sign_in: ^4.5.9
   google_nav_bar: ^3.2.0
   cached_network_image: ^2.5.0
+  mailer: ^3.2.1
+  flutter_dotenv: ^3.1.0
+  image_picker: ^0.6.7+22
+  firebase_storage: ^7.0.0
 
 dev_dependencies:
   flutter_test:
@@ -41,3 +45,4 @@ flutter:
 
   assets:
     - assets/
+    - .env
